@@ -25,6 +25,7 @@ import org.apache.rave.portal.model.Region;
 import org.apache.rave.portal.model.RegionWidget;
 import org.apache.rave.portal.model.User;
 import org.apache.rave.portal.model.impl.*;
+import org.apache.rave.portal.repository.UserRepository;
 import org.apache.rave.portal.web.renderer.RenderService;
 import org.apache.rave.portal.web.renderer.ScriptLocation;
 import org.apache.rave.portal.web.renderer.ScriptManager;
@@ -55,7 +56,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-@ContextConfiguration(locations = {"classpath:test-dataContext.xml", "classpath:test-applicationContext.xml"})
+@ContextConfiguration(locations = { "classpath:test-applicationContext.xml", "classpath:test-dataContext.xml"})
 //@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/dataContext.xml", "file:src/main/webapp/WEB-INF/applicationContext.xml"})
 public class RenderServiceIntegrationTest {
 
@@ -67,6 +68,9 @@ public class RenderServiceIntegrationTest {
 
     @Autowired
     private ShindigGadgetMetadataRepository metadataRepository;
+
+    @Autowired
+    private UserRepository repository;
 
     private RestOperations restOperations;
 
@@ -107,7 +111,7 @@ public class RenderServiceIntegrationTest {
 
     @Test
     public void renderOpenSocial() {
-        Page page = new PageImpl("1", VALID_USER_ID);
+        Page page = new PageImpl("1", repository.getByUsername(VALID_USER_NAME).getId());
         Region region = new RegionImpl("1", page, 1);
         page.setRegions(Arrays.asList(region));
 
