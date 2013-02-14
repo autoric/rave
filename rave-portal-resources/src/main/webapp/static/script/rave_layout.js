@@ -477,9 +477,10 @@ rave.layout = rave.layout || (function () {
             var users = userResults.result.resultSet;
             //prepare data for display
             _.each(users, function(user) {
+                //TODO: full object path needed because these funtions user "this" - fix search handler
                 user.isOwner = (user.id == rave.layout.searchHandler.userId);
-                user.hasShare = isUserAlreadyAdded(user.username);
-                user.hasEdit = isUserEditor(user.username);
+                user.hasShare = rave.layout.searchHandler.isUserAlreadyAdded(user.username);
+                user.hasEdit = rave.layout.searchHandler.isUserEditor(user.username);
             });
 
             var searchResultsModel = {

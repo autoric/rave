@@ -160,6 +160,7 @@
                 {{/if}}
             </td>
             <td class="pageEditorStatusHolder">
+                {{#if this.hasShare}}
                 {{#if this.hasEdit}}
                 <a href="#" data-userid="{{this.id}}" data-username="{{this.username}}"
                    data-function="removeEditingRightsFromMember">
@@ -170,6 +171,7 @@
                    data-function="addEditingRightsToMember">
                     {{getClientMessage "common.add"}}
                 </a>
+                {{/if}}
                 {{/if}}
             </td>
             <td class="cloneButtonHolder">
