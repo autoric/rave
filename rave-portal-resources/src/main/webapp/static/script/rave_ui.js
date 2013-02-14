@@ -37,7 +37,7 @@ rave.ui = rave.ui || (function () {
     function registerTemplates() {
         var templates = {};
         $('[data-template-for]').each(function () {
-            var key = $(this).attr('data-template-for');
+            var key = $(this).data('template-for');
             var source = $(this).html();
 
             templates[key] = Handlebars.compile(source);

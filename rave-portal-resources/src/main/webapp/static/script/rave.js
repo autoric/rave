@@ -568,10 +568,10 @@ var rave = rave || (function () {
             });
             var $markup = $(markup);
 
-            $('.prefs-save-button', $markup).click({id: regionWidget.regionWidgetId},
+            $markup.on('click', '.prefs-save-button', {id: regionWidget.regionWidgetId},
                 saveEditPrefsAction);
 
-            $('.prefs-cancel-button', $markup).click({id: regionWidget.regionWidgetId},
+            $markup.on('click', '.prefs-cancel-button', {id: regionWidget.regionWidgetId},
                 cancelEditPrefsAction);
 
             var prefsElement = $("#" + WIDGET_PREFS_CONTENT(regionWidget.regionWidgetId));
