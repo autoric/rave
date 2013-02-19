@@ -370,7 +370,7 @@ public class DefaultPageService implements PageService {
     public Boolean removeMemberFromPage(String pageId, String userId){
         User user = userService.getAuthenticatedUser();
         Page page = this.getPage(pageId);
-        if(page.getOwnerId().equals(user.getId())){
+	if(page.getOwnerId().equals(userId)){
             // If I am the owner, this page has been cloned
             // Declining a cloned page means there is no need to strip
             // out this users pageUser object, instead remove the page itself
