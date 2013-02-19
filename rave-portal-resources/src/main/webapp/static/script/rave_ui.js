@@ -20,6 +20,7 @@
 rave.ui = rave.ui || (function () {
     var exports = {};
 
+<<<<<<< HEAD
     //TODO: rave.getClientMessage view helper? Thank about it.
     Handlebars.registerHelper('getClientMessage', function (key) {
         return rave.getClientMessage(key);
@@ -105,6 +106,33 @@ rave.ui = rave.ui || (function () {
     views.pageShareView = new UserPageShareView();
 
     exports.views = views;
+=======
+    init();
+
+    function init(){
+        registerViewHelpers();
+        registerTemplates();
+    }
+
+    function registerViewHelpers(){
+        //TODO: rave.getClientMessage view helper? Thank about it.
+        Handlebars.registerHelper('getClientMessage', function(key){
+            return rave.getClientMessage(key);
+        })
+    }
+
+    function registerTemplates() {
+        var templates = {};
+        $('[data-template-for]').each(function () {
+            var key = $(this).attr('data-template-for');
+            var source = $(this).html();
+
+            templates[key] = Handlebars.compile(source);
+        });
+
+        exports.templates = templates;
+    }
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
 
     return exports;
 })()

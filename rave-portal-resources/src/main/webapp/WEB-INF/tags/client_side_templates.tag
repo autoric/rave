@@ -63,6 +63,10 @@
 
 <script type="text/handlebars" data-template-for="popup-slideout">
     <div class="popup slideout">
+<<<<<<< HEAD
+=======
+        <a href="#" class="close" >&times;</a>
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
         <div class="slideout-content">
         </div>
     </div>
@@ -85,6 +89,7 @@
 </script>
 
 <script type="text/handlebars" data-template-for="users-of-widget">
+<<<<<<< HEAD
     <div class="dialog widget-users-dialog" title="{{widgetName}} {{getClientMessage " widget.users.added_by
     "}}">
     <ul class="widget-users">
@@ -114,10 +119,18 @@
             {{#if nextLink.show}}
             <li><a href="#" data-pagenumber="{{nextLink.pageNumber}}">&gt;</a></li>
             {{/if}}
+=======
+    <div class="dialog widget-users-dialog" title="{{widgetName}} {{getClientMessage "widget.users.added_by"}}">
+        <ul class="widget-users">
+            {{#each users}}
+            <li class="widget-user">{{this.name}}</li>
+            {{/each}}
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
         </ul>
     </div>
 </script>
 
+<<<<<<< HEAD
 
 <script type="text/handlebars" data-template-for="user-search-results">
     <table class="searchdialogcontent">
@@ -290,3 +303,10 @@
 </script>
 
 
+=======
+<script type="text/handlebars" data-template-for="info-message">
+   <div class="alert alert-success navbar-spacer">
+       {{message}}
+   </div>
+</script>
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5

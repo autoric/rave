@@ -63,7 +63,13 @@ var rave = rave || (function () {
                 contentSelector: '.slideout-content',
                 template: 'popup-slideout',
                 initialize: function (container) {
+<<<<<<< HEAD
                     container.find(this.contentSelector).data('popupType', this.name);
+=======
+                    var content = container.find(this.contentSelector);
+                    content.data('popupType', this.name);
+                    container.find('.close').click(function(){ destroyPopup(content);});
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
                     container.show("slide", { direction: "right" }, 'fast');
                     $('body').addClass('modal-open');
                     $('body').append('<div class="modal-backdrop fade in"></div>');
@@ -165,7 +171,11 @@ var rave = rave || (function () {
                 opacity: 0.5, // the opacity of the object being dragged
                 revert: true, // smooth snap animation
                 cursor: 'move', // the cursor to show while dnd
+<<<<<<< HEAD
                 handle: '.widget-title-bar', // the draggable handle
+=======
+                handle: '.widget-title-bar-draggable', // the draggable handle
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
                 forcePlaceholderSize: true, // size the placeholder to the size of the widget
                 tolerance: 'pointer', // change dnd drop zone on mouse-over
                 start: dragStart, // event listener for drag start
@@ -568,10 +578,17 @@ var rave = rave || (function () {
             });
             var $markup = $(markup);
 
+<<<<<<< HEAD
             $markup.on('click', '.prefs-save-button', {id: regionWidget.regionWidgetId},
                 saveEditPrefsAction);
 
             $markup.on('click', '.prefs-cancel-button', {id: regionWidget.regionWidgetId},
+=======
+            $('.prefs-save-button', $markup).click({id: regionWidget.regionWidgetId},
+                saveEditPrefsAction);
+
+            $('.prefs-cancel-button', $markup).click({id: regionWidget.regionWidgetId},
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
                 cancelEditPrefsAction);
 
             var prefsElement = $("#" + WIDGET_PREFS_CONTENT(regionWidget.regionWidgetId));
@@ -746,6 +763,7 @@ var rave = rave || (function () {
                 _.each(data, function (person) {
                     person.name = person.displayName || person.preferredName || (person.givenName + " " + person.familyName);
                 });
+<<<<<<< HEAD
 
                 var markup = rave.ui.templates['users-of-widget']({
                     users: data,
@@ -753,6 +771,15 @@ var rave = rave || (function () {
                     widgetName: $("#widget-" + widgetId + "-title").text().trim()
                 });
 
+=======
+
+                var markup = rave.ui.templates['users-of-widget']({
+                    users: data,
+                    //TODO: data from dom evil! should be using gadget object to get name
+                    widgetName: $("#widget-" + widgetId + "-title").text().trim()
+                });
+
+>>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
                 //TODO: don't use jquery ui dialogs?
                 $(markup).dialog({
                     modal: true,
