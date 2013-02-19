@@ -177,7 +177,7 @@
             </td>
             <td class="cloneButtonHolder">
                 <a href="#" data-userid="{{this.id}}" data-username="{{this.username}}"
-                   data-action="clonePageForUser">
+                   data-action="cloneForUser">
                     {{getClientMessage "page.clone.dialog.detail"}}
                 </a>
             </td>
@@ -277,7 +277,7 @@
                     </td>
                     <td class="cloneButtonHolder">
                         <a href="#" data-userid="{{this.id}}" data-username="{{this.username}}"
-                           data-action="clonePageForUser">
+                           data-action="cloneForUser">
                             {{getClientMessage "page.clone.dialog.detail"}}
                         </a>
                     </td>

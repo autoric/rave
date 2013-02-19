@@ -44,6 +44,7 @@ rave.Collection = Backbone.Collection.extend({
 rave.View = Backbone.View.extend({
     initialize: function () {
         var self = this;
+        _.bindAll(this);
 
         _.each(this.models, function (model) {
             model.on('change', self.render);
