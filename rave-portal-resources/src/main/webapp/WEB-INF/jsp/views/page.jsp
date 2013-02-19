@@ -94,7 +94,7 @@
                                 <li id="pageMenuDelete" class="<c:if test='${hasOnlyOnePage or isSharedToMe}'>menu-item-disabled</c:if>"><a href="#"><fmt:message key="page.general.deletepage"/></a></li>
                                 <li id="pageMenuMove" class="<c:if test='${hasOnlyOnePage}'>menu-item-disabled</c:if>"><a href="#"><fmt:message key="page.general.movepage"/></a></li>
                                 <li id="pageMenuExport" class="hidden"><a href="#"><fmt:message key="page.general.exportpage"/></a></li>
-                                <li id="pageMenuShare" class="<c:if test="${isSharedToMe}">menu-item-disabled</c:if>"><a href="#"><fmt:message key="page.general.sharepage"/></a></li>
+                                <li id="pageMenuShare" class="<c:if test="${isSharedToMe}">menu-item-disabled</c:if>"><a href="#sharePageDialog" data-toggle="modal"><fmt:message key="page.general.sharepage"/></a></li>
                                 <li id="pageMenuRevokeShare" class="<c:if test="${isSharedToMe == false}">menu-item-disabled</c:if>"><a href="#"><fmt:message key="page.general.removeshare"/></a></li>
                             </ul>
                         </li>
@@ -384,7 +384,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn" onclick="$('#sharePageDialog').modal('hide');"><fmt:message key="_rave_client.common.cancel"/></a>
+        <a href="#" class="btn" data-dismiss="modal"><fmt:message key="_rave_client.common.cancel"/></a>
     </div>
 </div>
 
@@ -400,8 +400,10 @@
             rave.runOnPageInitializedHandlers();
         });
     </script>
+    <script>rave.models.page.set({id: ${page.id}, ownerId: <sec:authentication property="principal.id" />}, {silent:true})</script>
     <c:forEach var="members" items="${page.members}">
         <portal:person id="${members.userId}" var="member" />
         <script>rave.layout.searchHandler.addExistingMember("${member.username}",${members.editor});</script>
+        <script>rave.models.page.addInitData('${member.id}', ${members.editor})</script>
     </c:forEach>
 </portal:register-init-script>

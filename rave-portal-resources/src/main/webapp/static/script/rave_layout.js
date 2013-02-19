@@ -163,7 +163,7 @@ rave.layout = rave.layout || (function () {
             }
             // setup the share page menu item
             if (!$menuItemShare.hasClass("menu-item-disabled")) {
-                $menuItemShare.bind('click', function (event) {
+                /*$menuItemShare.bind('click', function (event) {
                     rave.api.rpc.getUsers({offset: 0,
                         successCallback: function (result) {
                             rave.layout.searchHandler.dealWithUserResults(result);
@@ -173,7 +173,7 @@ rave.layout = rave.layout || (function () {
                             $("#sharePageDialog").modal('show');
                         }
                     });
-                });
+                });*/
             }
 
             // setup the revoke share page menu item
@@ -470,7 +470,7 @@ rave.layout = rave.layout || (function () {
             // show the listheader
             $('#shareSearchListHeader').text(legend);
 
-            var $targetDiv = $('#shareSearchResults');
+            //var $targetDiv = $('#shareSearchResults');
 
             paginate(userResults.result);
 
@@ -500,136 +500,6 @@ rave.layout = rave.layout || (function () {
             });
 
             $targetDiv.html($markup);
-
-            /*$targetDiv.empty();
-            // show the paginator
-            paginate(userResults.result);
-            //now build the content
-            $targetDiv
-                .append(
-                    $("<table/>")
-                        .addClass("searchdialogcontent")
-                        .append(
-                            $("<tr/>")
-                                .append(
-                                    $("<td/>")
-                                        .addClass("textcell")
-                                        .append(
-                                            $("<b/>")
-                                                .text(rave.getClientMessage("common.username"))
-                                        )
-                                )
-                                .append(
-                                    $("<td/>")
-                                        .addClass("booleancell")
-                                        .append(
-                                            $("<b/>")
-                                                .text(rave.getClientMessage("common.sharing"))
-                                        )
-                                )
-                                .append(
-                                    $("<td/>")
-                                        .addClass("booleancell")
-                                        .append(
-                                            $("<b/>")
-                                                .text(rave.getClientMessage("common.editing.auth"))
-                                        )
-                                )
-                                .append(
-                                    $("<td/>")
-                                        .addClass("booleancell")
-                                        .append(
-                                            $("<b/>")
-                                                .text(rave.getClientMessage("page.clone.dialog.title"))
-                                        )
-                                )
-                        )
-                        .append(
-                            $("<tbody/>")
-                                .attr("id", "searchResultsBody")
-                        )
-                )
-
-            jQuery.each(userResults.result.resultSet, function () {
-                $('#searchResultsBody')
-                    .append(
-                        $("<tr/>")
-                            .attr("id", "searchResultRecord")
-                            .append(
-                                $("<td/>")
-                                    .text(this.username)
-                            )
-                            .append(
-                                $("<td/>")
-                                    .attr("id", "shareButtonHolder" + this.id)
-                            )
-                            .append(
-                                $("<td/>")
-                                    .attr("id", "pageEditorStatusHolder" + this.id)
-                            )
-                            .append(
-                                $("<td/>")
-                                    .attr("id", "cloneButtonHolder" + this.id)
-                            )
-                    )
-
-
-                if (this.username != rave.layout.searchHandler.username) {
-                    //
-                    $('#cloneButtonHolder' + this.id)
-                        .append(
-                            $("<a/>")
-                                .attr("href", "#")
-                                .attr("id", this.id)
-                                .attr("onclick", "rave.layout.searchHandler.clonePageForUser(" + this.id + ", '" + this.username + "');")
-                                .text(rave.getClientMessage("page.clone.dialog.detail"))
-                        )
-                    //
-
-                    // check if already added
-                    if (rave.layout.searchHandler.isUserAlreadyAdded(this.username)) {
-                        $('#shareButtonHolder' + this.id)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", this.id)
-                                    .attr("onclick", "rave.layout.searchHandler.removeMemberFromPage(" + this.id + ", '" + this.username + "');")
-                                    .text(rave.getClientMessage("common.remove"))
-                            )
-                        if (rave.layout.searchHandler.isUserEditor(this.username)) {
-                            $('#pageEditorStatusHolder' + this.id)
-                                .append(
-                                    $("<a/>")
-                                        .attr("href", "#")
-                                        .attr("id", this.id)
-                                        .attr("onclick", "rave.layout.searchHandler.removeEditingRightsFromMember(" + this.id + ", '" + this.username + "');")
-                                        .text(rave.getClientMessage("common.remove"))
-                                )
-                        }
-                        else {
-                            $('#pageEditorStatusHolder' + this.id)
-                                .append(
-                                    $("<a/>")
-                                        .attr("href", "#")
-                                        .attr("id", this.id)
-                                        .attr("onclick", "rave.layout.searchHandler.addEditingRightsToMember(" + this.id + ", '" + this.username + "');")
-                                        .text(rave.getClientMessage("common.add"))
-                                )
-                        }
-                    } else {
-                        $('#shareButtonHolder' + this.id)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", this.id)
-                                    .attr("onclick", "rave.layout.searchHandler.addMemberToPage(" + this.id + ", '" + this.username + "');")
-                                    .text(rave.getClientMessage("common.add"))
-                            )
-                    }
-                }
-
-            })//end jqueryeach
-            */
         }//end dealwithresults
 
         return {

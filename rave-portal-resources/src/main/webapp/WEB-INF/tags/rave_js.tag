@@ -29,6 +29,8 @@
 <c:choose>
     <c:when test="${jsDebugMode == '1'}">
         <script src="<spring:url value="/static/script/rave.js"/>"></script>
+        <script src="<spring:url value="/static/script/rave_backbone.js"/>"></script>
+        <script src="<spring:url value="/static/script/rave_models.js"/>"></script>
         <script src="<spring:url value="/static/script/rave_api.js"/>"></script>
         <script src="<spring:url value="/static/script/rave_opensocial.js"/>"></script>
         <script src="<spring:url value="/static/script/rave_wookie.js"/>"></script>
