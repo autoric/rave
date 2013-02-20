@@ -161,26 +161,11 @@ rave.layout = rave.layout || (function () {
                     window.open(rave.getContext() + "api/rest/" + "page/" + getCurrentPageId() + "/omdl");
                 });
             }
-            // setup the share page menu item
-            if (!$menuItemShare.hasClass("menu-item-disabled")) {
-                /*$menuItemShare.bind('click', function (event) {
-                    rave.api.rpc.getUsers({offset: 0,
-                        successCallback: function (result) {
-                            rave.layout.searchHandler.dealWithUserResults(result);
-                            $('#sharePageDialog').on('shown', function () {
-                                $("#searchTerm").first().focus();
-                            });
-                            $("#sharePageDialog").modal('show');
-                        }
-                    });
-                });*/
-            }
 
             // setup the revoke share page menu item
             if (!$menuItemRevokeShare.hasClass("menu-item-disabled")) {
                 $menuItemRevokeShare.bind('click', function (event) {
-                    rave.layout.searchHandler.removeMemberFromPage(rave.layout.searchHandler.userId,
-                        rave.layout.searchHandler.username);
+                    rave.models.currentPage.removeForSelf();
                 });
             }
         }
@@ -191,335 +176,6 @@ rave.layout = rave.layout || (function () {
     })();
 
     // functions associated with the user search for sharing pages
-    var searchHandler = (function () {
-        var username;
-        var userId;
-        var pageId;
-        var existingSharers;
-
-        function setDefaults(username, userId, pageId, pageStatus) {
-            if (this.existingSharers == "undefined" || this.existingSharers == null) {
-                this.existingSharers = {};
-            }
-            this.username = username;
-            this.userId = userId;
-            this.pageId = pageId;
-        }
-
-        function addExistingMember(member, isEditor) {
-            if (this.existingSharers == "undefined" || this.existingSharers == null) {
-                this.existingSharers = {};
-            }
-            this.existingSharers[member] = isEditor;
-        }
-
-        function removeExistingMember(member) {
-            delete this.existingSharers[member];
-        }
-
-        function isUserAlreadyAdded(username) {
-            for (member in this.existingSharers) {
-                if (username == member) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        function isUserEditor(username) {
-            for (member in this.existingSharers) {
-                if (username == member) {
-                    if (this.existingSharers[member] == true) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        function removeMemberFromPage(userId, username) {
-            var answer;
-            if (userId == rave.layout.searchHandler.userId) {
-                answer = confirm(rave.getClientMessage("revoke.share.current.user.confirm"));
-            } else {
-                answer = confirm(rave.getClientMessage("revoke.share.confirm") + " (" + username + ")");
-            }
-            if (answer) {
-                $('#shareButtonHolder' + userId).hide();
-                rave.api.rpc.removeMemberFromPage({pageId: this.pageId, userId: userId,
-                    successCallback: function (result) {
-                        rave.layout.searchHandler.removeExistingMember(username);
-                        $('#pageEditorStatusHolder' + userId).empty();
-                        $('#shareButtonHolder' + userId).empty();
-                        $('#shareButtonHolder' + userId)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", userId)
-                                    .attr("onclick", "rave.layout.searchHandler.addMemberToPage(" + userId + ", '" + username + "');")
-                                    .text(rave.getClientMessage("common.add"))
-                            )
-                        $('#shareButtonHolder' + userId).show();
-                        if (userId == rave.layout.searchHandler.userId) {
-                            alert(rave.getClientMessage("revoke.share.current.user"));
-                            // reload as page has been removed
-                            document.location.href = '/';
-                        } else {
-                            alert("(" + username + ") " + rave.getClientMessage("revoke.share"));
-                        }
-                    }
-                });
-            }
-        }
-
-        function clonePageForUser(userId, username) {
-            var answer = confirm(rave.getClientMessage("confirm.clone.page") + " (" + username + ")");
-            if (answer) {
-                rave.layout.clonePage(this.pageId, userId, null);
-            }
-        }
-
-        function addMemberToPage(userId, username) {
-            var answer = confirm(rave.getClientMessage("create.share.confirm") + " (" + username + ")");
-            if (answer) {
-                $('#shareButtonHolder' + userId).hide();
-                rave.api.rpc.addMemberToPage({pageId: this.pageId, userId: userId,
-                    successCallback: function (result) {
-                        rave.layout.searchHandler.addExistingMember(username);
-                        $('#shareButtonHolder' + userId).empty();
-                        $('#shareButtonHolder' + userId)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", userId)
-                                    .attr("onclick", "rave.layout.searchHandler.removeMemberFromPage(" +
-                                        userId + ", '" + username + "');")
-                                    .text(rave.getClientMessage("common.remove"))
-                            )
-                        $('#shareButtonHolder' + userId).show();
-                        $('#pageEditorStatusHolder' + userId).empty();
-                        $('#pageEditorStatusHolder' + userId)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", userId)
-                                    .attr("onclick", "rave.layout.searchHandler.addEditingRightsToMember(" + userId + ", '" + username + "');")
-                                    .text(rave.getClientMessage("common.add"))
-                            )
-                        alert("(" + username + ") " + rave.getClientMessage("create.share"));
-                    }
-                });
-            }
-        }
-
-        function removeEditingRightsFromMember(userId, username) {
-            var answer = confirm(rave.getClientMessage("revoke.editing.user.confirm") + " (" + username + ")");
-            if (answer) {
-                $('#pageEditorStatusHolder' + userId).hide();
-                rave.api.rpc.updatePageEditingStatus({pageId: this.pageId, userId: userId, isEditor: false,
-                    successCallback: function (result) {
-                        rave.layout.searchHandler.existingSharers[username] = false;
-                        $('#pageEditorStatusHolder' + userId).empty();
-                        $('#pageEditorStatusHolder' + userId)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", userId)
-                                    .attr("onclick", "rave.layout.searchHandler.addEditingRightsToMember(" + userId + ", '" + username + "');")
-                                    .text(rave.getClientMessage("common.add"))
-                            )
-                        $('#pageEditorStatusHolder' + userId).show();
-                    }
-                });
-            }
-        }
-
-        function addEditingRightsToMember(userId, username) {
-            var answer = confirm(rave.getClientMessage("grant.editing.user.confirm") + " (" + username + ")");
-            if (answer) {
-                $('#pageEditorStatusHolder' + userId).hide();
-                rave.api.rpc.updatePageEditingStatus({pageId: this.pageId, userId: userId, isEditor: true,
-                    successCallback: function (result) {
-                        rave.layout.searchHandler.existingSharers[username] = true;
-                        $('#pageEditorStatusHolder' + userId).empty();
-                        $('#pageEditorStatusHolder' + userId)
-                            .append(
-                                $("<a/>")
-                                    .attr("href", "#")
-                                    .attr("id", userId)
-                                    .attr("onclick", "rave.layout.searchHandler.removeEditingRightsFromMember(" + userId + ", '" + username + "');")
-                                    .text(rave.getClientMessage("common.remove"))
-                            )
-                        $('#pageEditorStatusHolder' + userId).show();
-                    }
-                });
-            }
-        }
-
-        function acceptShare() {
-            var answer;
-            answer = confirm(rave.getClientMessage("accept.share.confirm"));
-            if (answer) {
-                rave.api.rpc.updateSharedPageStatus({pageId: rave.layout.searchHandler.pageId, shareStatus: 'accepted',
-                    successCallback: function (result) {
-                        rave.viewPage(rave.layout.searchHandler.pageId);
-                    }
-                });
-            }
-        }
-
-        function declineShare() {
-            var answer;
-            answer = confirm(rave.getClientMessage("decline.share.confirm"));
-            if (answer) {
-                rave.api.rpc.updateSharedPageStatus({pageId: rave.layout.searchHandler.pageId, shareStatus: 'refused',
-                    successCallback: function (result) {
-                        rave.api.rpc.removeMemberFromPage({pageId: rave.layout.searchHandler.pageId, userId: rave.layout.searchHandler.userId,
-                            successCallback: function (result) {
-                                document.location.href = '/';
-                            }});
-                    }
-                })
-            }
-        }
-
-        function init() {
-            // user clicks "search" in the find users dialog
-            $("#shareSearchButton").click(function () {
-                $('#shareSearchResults').empty();
-                rave.api.rpc.searchUsers({searchTerm: $('#searchTerm').get(0).value, offset: 0,
-                    successCallback: function (result) {
-                        rave.layout.searchHandler.dealWithUserResults(result);
-                    }
-                });
-            });
-
-            // user clicks "clear search" in the find users dialog
-            $("#clearSearchButton").click(function () {
-                $('#searchTerm').get(0).value = "";
-                $('#shareSearchResults').empty();
-                rave.api.rpc.getUsers({offset: 0,
-                    successCallback: function (result) {
-                        rave.layout.searchHandler.dealWithUserResults(result);
-                    }
-                });
-            });
-        }//end of init()
-
-        function updateParamsInString(i18nStr, itemsToReplace) {
-            for (var i = 0; i < itemsToReplace.length; i++) {
-                var token = '{' + i + '}';
-                i18nStr = i18nStr.replace(token, itemsToReplace[i]);
-            }
-            return i18nStr;
-        }
-
-        function paginate(userSearchData) {
-            var $pagingDiv = $('#shareSearchListPaging');
-
-            var paginationModel = {
-                prevLink: {
-                    show: userSearchData.currentPage > 1 ? true : false,
-                    pageNumber: userSearchData.currentPage - 1
-                },
-                nextLink: {
-                    show: userSearchData.currentPage < userSearchData.numberOfPages ? true : false,
-                    pageNumber: userSearchData.currentPage + 1
-                },
-                //pages will be an array of objects from 1 to number of pages
-                pages: _.map(_.range(1, userSearchData.numberOfPages + 1), function (pageNumber) {
-                    return {
-                        pageNumber: pageNumber,
-                        current: pageNumber == userSearchData.currentPage
-                    }
-                })
-            }
-
-            var markup = rave.ui.templates['user-search-pagination'](paginationModel);
-            var $markup = $(markup);
-            $markup.on('click', 'a', function () {
-                var pageNumber = $(this).data('pagenumber');
-
-                rave.api.rpc.getUsers({
-                    offset: (pageNumber-1)*userSearchData.pageSize,
-                    successCallback: rave.layout.searchHandler.dealWithUserResults
-                });
-
-                return false;
-            });
-
-            $pagingDiv.html($markup);
-        }
-
-        function dealWithUserResults(userResults) {
-            //TODO: deal with this -
-            var searchTerm = $('#searchTerm').get(0).value;
-            if (searchTerm == undefined || searchTerm == "") {
-                $('#clearSearchButton').hide();
-            } else {
-                $('#clearSearchButton').show();
-            }
-            var legend;
-            if (userResults.result.resultSet.length < 1) {
-                legend = rave.getClientMessage("no.results.found");
-            } else {
-                legend = updateParamsInString(rave.getClientMessage("search.list.result.x.to.y"),
-                    new Array(userResults.result.offset + 1, userResults.result.resultSet.length
-                        + userResults.result.offset, userResults.result.totalResults));
-            }
-            // show the listheader
-            $('#shareSearchListHeader').text(legend);
-
-            //var $targetDiv = $('#shareSearchResults');
-
-            paginate(userResults.result);
-
-            var users = userResults.result.resultSet;
-            //prepare data for display
-            _.each(users, function(user) {
-                //TODO: full object path needed because these funtions user "this" - fix search handler
-                user.isOwner = (user.id == rave.layout.searchHandler.userId);
-                user.hasShare = rave.layout.searchHandler.isUserAlreadyAdded(user.username);
-                user.hasEdit = rave.layout.searchHandler.isUserEditor(user.username);
-            });
-
-            var searchResultsModel = {
-                users: users
-            }
-
-            var markup = rave.ui.templates['user-search-results'](searchResultsModel);
-            var $markup = $(markup);
-
-            $markup.on('click', 'a', function(){
-                var $link = $(this);
-                var fn = $link.data('function');
-                var userid = $link.data('userid');
-                var username = $link.data('username');
-
-                rave.layout.searchHandler[fn](userid, username);
-            });
-
-            $targetDiv.html($markup);
-        }//end dealwithresults
-
-        return {
-            init: init,
-            dealWithUserResults: dealWithUserResults,
-            setDefaults: setDefaults,
-            addExistingMember: addExistingMember,
-            removeExistingMember: removeExistingMember,
-            isUserAlreadyAdded: isUserAlreadyAdded,
-            isUserEditor: isUserEditor,
-            addMemberToPage: addMemberToPage,
-            clonePageForUser: clonePageForUser,
-            removeMemberFromPage: removeMemberFromPage,
-            addEditingRightsToMember: addEditingRightsToMember,
-            removeEditingRightsFromMember: removeEditingRightsFromMember,
-            acceptShare: acceptShare,
-            declineShare: declineShare,
-            updateParamsInString: updateParamsInString
-        }
-    })();
 
     // widget menu related functions
     var widgetMenu = (function () {
@@ -859,44 +515,6 @@ rave.layout = rave.layout || (function () {
         }
     }
 
-    function clonePage(pageId, userId, pageName) {
-        rave.api.rpc.clonePageForUser({pageId: pageId, userId: userId, pageName: pageName,
-            successCallback: function (result) {
-                if (result.error) {
-                    if (result.errorCode == 'DUPLICATE_ITEM') {
-                        $("#sharePageDialog").modal('hide');
-                        //
-                        $("#pageMenuDialogHeader").html(rave.getClientMessage("page.update"));
-                        $("#pageFormErrors").html(rave.getClientMessage("page.duplicate_name"));
-                        $("#pageLayoutGroup").hide();
-                        var $pageMenuUpdateButton = $("#pageMenuUpdateButton");
-                        $pageMenuUpdateButton.html(rave.getClientMessage("common.save"));
-                        // unbind the previous click event since we are sharing the
-                        // dialog between separate add/edit page actions
-                        $pageMenuUpdateButton.unbind('click');
-                        $pageMenuUpdateButton.click(function () {
-                            if ($pageForm.valid()) {
-                                rave.layout.clonePage(pageId, userId, $tab_title_input.val());
-                            }
-                        });
-                        $('#pageMenuDialog').on('shown', function () {
-                            $("#tab_title").first().focus();
-                        });
-                        //
-                        $("#pageMenuDialog").modal('show');
-                    } else {
-                        $("#pageMenuDialog").modal('hide');
-                        alert(rave.getClientMessage("api.rpc.error.internal"));
-                    }
-                }
-                else {
-                    $("#pageMenuDialog").modal('hide');
-                    alert(rave.getClientMessage("success.clone.page"));
-                }
-            }
-        });
-    }
-
     function closePageDialog() {
         $pageForm[0].reset();
         $tab_id.val('');
@@ -969,7 +587,6 @@ rave.layout = rave.layout || (function () {
     function init(showImportExport) {
         pageMenu.init(showImportExport);
         widgetMenu.init();
-        searchHandler.init();
         // initialize the bootstrap dropdowns
         $(".dropdown-toggle").dropdown();
     }
@@ -985,13 +602,11 @@ rave.layout = rave.layout || (function () {
         addPage: addPage,
         addOrImportPage: addOrImportPage,
         updatePage: updatePage,
-        clonePage: clonePage,
         movePage: movePage,
         importPage: importPage,
         closePageDialog: closePageDialog,
         closePageDialogTabbed: closePageDialogTabbed,
         moveWidgetToPage: moveWidgetToPage,
-        searchHandler: searchHandler,
         isWidgetOnHiddenTab: isWidgetOnHiddenTab,
         addIframeOverlays: addIframeOverlays
     };

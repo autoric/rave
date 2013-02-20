@@ -175,10 +175,10 @@
 	                </div>
 	                <div>&nbsp;</div>
 	                <div>
-	                    <a href="#" onclick="rave.layout.searchHandler.acceptShare()"><fmt:message key="_rave_client.common.accept"/></a>
+	                    <a href="#" onclick="rave.models.currentPage.acceptShare()"><fmt:message key="_rave_client.common.accept"/></a>
 	                </div>
 	                <div>
-	                    <a href="#" onclick="rave.layout.searchHandler.declineShare();"><fmt:message key="_rave_client.common.decline"/></a>
+	                    <a href="#" onclick="rave.models.currentPage.declineShare();"><fmt:message key="_rave_client.common.decline"/></a>
 	                </div>
 	                <div class="clear-float">&nbsp;</div>
 	            </div>
@@ -393,17 +393,15 @@
         $(function() {
             rave.initPageEditorStatus(<c:out value="${pageUser.editor}"/>);
             rave.initProviders();
-            rave.layout.searchHandler.setDefaults("<c:out value="${principleUsername}"/>","<sec:authentication property="principal.id" />","<c:out value="${page.id}"/>", "${pageUser.pageStatus}");
             rave.initWidgets();
             rave.initUI();
             rave.layout.init(${applicationProperties['portal.export.ui.enable']});
             rave.runOnPageInitializedHandlers();
         });
     </script>
-    <script>rave.models.page.set({id: ${page.id}, ownerId: <sec:authentication property="principal.id" />}, {silent:true})</script>
+    <script>rave.models.currentPage.set({id: ${page.id}, ownerId: ${page.ownerId}, viewerId: <sec:authentication property="principal.id" />}, {silent:true})</script>
     <c:forEach var="members" items="${page.members}">
         <portal:person id="${members.userId}" var="member" />
-        <script>rave.layout.searchHandler.addExistingMember("${member.username}",${members.editor});</script>
-        <script>rave.models.page.addInitData('${member.id}', ${members.editor})</script>
+        <script>rave.models.currentPage.addInitData('${member.id}', ${members.editor})</script>
     </c:forEach>
 </portal:register-init-script>

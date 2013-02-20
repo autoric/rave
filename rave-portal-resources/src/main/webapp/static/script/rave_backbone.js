@@ -18,11 +18,21 @@
  */
 var rave = rave || {};
 
+/*
+Extend backbone's standard model and collection with some
+ */
 rave.Model = Backbone.Model.extend({
     get: function(attr){
         //tweak model get so that array / object members are passed by value instead of reference
+        //needed for managing deep objects
         return _.clone(this.attributes[attr]);
     },
+
+    /*
+    Overridable function that models can implement for serializing themselves for view rendering,
+    since often a handlebars template needs explicit keys or booleans that don't make sense
+    in a normal json representation of the model. By default will just return toJSON().
+     */
     toViewModel: function () {
         return this.toJSON();
     }
@@ -38,8 +48,10 @@ rave.Collection = Backbone.Collection.extend({
 
 
 /*
- A view has a hash of models (can be a model or a collection) that will be merged at render time.
- By default any change will re-render the view
+ rave.View is an extension of Backbone's view with some scaffolding put in place. The expectation is that a view
+ will be declared with a hash of models (models or collections) that will be merged and fed to the view at render
+ time. By default on any change to the models the view will be re-rendered. Also provides an implementation of
+ render that probably will not need to be overrridden.
  */
 rave.View = Backbone.View.extend({
     initialize: function () {
@@ -63,37 +75,3 @@ rave.View = Backbone.View.extend({
         return this;
     }
 });
-
-
-/*
- Models:
-
- Users (?)
-
- Widget
- - Add / delete like
- - Add / delete dislike
- - Create, update, delete comment
- - Get users of widget
- - Create / Delete tag
- - Add to page
-
- RegionWidget
- - Save collapsed state
- - Save Preferences
- - Move
-
- Page
- - Add, Delete, Get
- - Add / get "members" and "editors" (page sharing)
-
- */
-
-/*
- What do I need from a model?
-
- - Data representation as retrieved
- - toJSON and toViewModel representation
- - manipulation methods- change and save
- - change events
- */

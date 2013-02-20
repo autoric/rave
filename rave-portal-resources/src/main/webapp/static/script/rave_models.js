@@ -2,21 +2,36 @@ var rave = rave || {};
 
 rave.models = (function () {
 
+    /*
+     User model. Further implementation pending.
+     */
     var User = rave.Model.extend({
-        acceptShare: function () {
 
-        },
-        declineShare: function () {
-
-        }
     });
 
+    /*
+     Collection of users. Currently used for the share page users search.
+     */
     var Users = rave.Collection.extend({
         model: User,
         pageSize: 10,
+
+        //empty pagination data, is filled in on requests
+        paginationData: {
+            start:0,
+            finish: 0,
+            total: 0,
+            prevLink: {},
+            nextLink: {},
+            pages: []
+        },
+
         initialize: function(){
+            //ensure that parse is always invoked in the context of this object
             _.bindAll(this, 'parse');
         },
+
+        //filter collection with a search term
         filter: function (term) {
             this.searchTerm = term;
 
@@ -27,6 +42,8 @@ rave.models = (function () {
                 rave.api.rpc.getUsers({offset: 0, successCallback: this.parse });
             }
         },
+
+        //used for pagination
         fetchPage: function (page) {
             var self = this;
 
@@ -40,6 +57,8 @@ rave.models = (function () {
                 rave.api.rpc.getUsers({offset: offset, successCallback: this.parse });
             }
         },
+
+        //parse return data from the rpc call into a usable data model
         parse: function (data) {
             var result = data.result;
             this.pageSize = result.pageSize || 10;
@@ -68,6 +87,8 @@ rave.models = (function () {
 
             this.reset(result.resultSet);
         },
+
+        //When toViewModel is invoked, also provide pagination and filter data
         toViewModel: function () {
             return {
                 searchTerm: this.searchTerm,
@@ -77,12 +98,20 @@ rave.models = (function () {
         }
     });
 
+    /*
+     Page model. Used for managing most of the sharing functionality.
+     */
     var Page = rave.Model.extend({
+
         defaults: {
-            id: -1,
-            ownerId: -1,
             members: {}
         },
+
+        /*
+         TODO: currently this is used to silently bootstrap the page model from the page view. Once
+         the jsp views are lightened up we should be able to provide a full representation of the page
+         model to pass to .set() and this should not be needed.
+         */
         addInitData: function (userId, isEditor) {
             var members = this.get('members');
 
@@ -98,6 +127,10 @@ rave.models = (function () {
             return userId == this.get('ownerId');
         },
 
+        isUserView: function(userId) {
+            return userId == this.get('viewerId');
+        },
+
         isUserMember: function (userId) {
             return this.get('members')[userId] ? true : false;
         },
@@ -109,7 +142,8 @@ rave.models = (function () {
 
         addMember: function (userId) {
             var self = this;
-            rave.api.rpc.addMemberToPage({pageId: self.id, userId: userId,
+
+            rave.api.rpc.addMemberToPage({pageId: self.get('id'), userId: userId,
                 successCallback: function (result) {
                     var members = self.get('members');
 
@@ -119,27 +153,46 @@ rave.models = (function () {
                     }
 
                     self.set('members', members);
+                    /*
+                     The model does not manage or care about views. Instead it fires events
+                     that views can subscribe to for ui representation.
+                     TODO: solidify and document eventing model
+                     */
+                    self.trigger('share', 'member:add', userId);
                 }
             });
 
         },
+
         removeMember: function (userId) {
             var self = this;
-            //removeMemberFromPage
-            rave.api.rpc.removeMemberFromPage({pageId: self.id, userId: userId,
+
+            rave.api.rpc.removeMemberFromPage({pageId: self.get('id'), userId: userId,
                 successCallback: function (result) {
                     var members = self.get('members');
 
                     delete members[userId];
 
                     self.set('members', members);
+                    self.trigger('share', 'member:remove', userId);
                 }
             });
         },
+
+        removeForSelf: function(){
+            var self = this;
+
+            rave.api.rpc.removeMemberFromPage({pageId: self.get('id'), userId: self.get('viewerId'),
+                successCallback: function () {
+                    self.trigger('declineShare', self.get('id'));
+                }
+            });
+        },
+
         addEditor: function (userId) {
             var self = this;
             //updatePageEditingStatus
-            rave.api.rpc.updatePageEditingStatus({pageId: self.id, userId: userId, isEditor: true,
+            rave.api.rpc.updatePageEditingStatus({pageId: self.get('id'), userId: userId, isEditor: true,
                 successCallback: function () {
                     var members = self.get('members');
 
@@ -149,12 +202,14 @@ rave.models = (function () {
                     }
 
                     self.set('members', members);
+                    self.trigger('share', 'editor:add', userId);
                 }
             });
         },
+
         removeEditor: function (userId) {
             var self = this;
-            rave.api.rpc.updatePageEditingStatus({pageId: self.id, userId: userId, isEditor: false,
+            rave.api.rpc.updatePageEditingStatus({pageId: self.get('id'), userId: userId, isEditor: false,
                 successCallback: function () {
 
                     var members = self.get('members');
@@ -165,20 +220,55 @@ rave.models = (function () {
                     }
 
                     self.set('members', members);
+                    self.trigger('share', 'editor:remove', userId);
                 }
             });
         },
-        cloneForUser: function (userId, pageName) {
-            rave.api.rpc.updatePageEditingStatus({pageId: this.id, userId: userId, pageName: pageName,
-                successCallback: function () {
 
+        cloneForUser: function (userId, pageName) {
+            pageName = pageName || null;
+            var self =this;
+            rave.api.rpc.clonePageForUser({pageId: this.get('id'), userId: userId, pageName: pageName,
+                successCallback: function(result){
+                    if(result.error) {
+                        /*
+                         TODO: this is a weird error handling condition used by clone to catch duplicate
+                         named pages. Firing an event and letting the view handle for now, but the api
+                         should be managing errors better.
+                         */
+                        return self.trigger('error', result.errorCode, userId);
+                    }
+                    self.trigger('share', 'clone', userId);
                 }
             });
+        },
+
+        acceptShare: function(){
+            var self = this;
+            rave.api.rpc.updateSharedPageStatus({pageId: this.get('id'), shareStatus: 'accepted',
+                successCallback: function (result) {
+                    self.trigger('acceptShare', self.get('id'));
+                }
+            });
+        },
+
+        declineShare: function(){
+            var self = this;
+
+            rave.api.rpc.updateSharedPageStatus({pageId: this.get('id'), shareStatus: 'refused',
+                successCallback: function (result) {
+                    rave.api.rpc.removeMemberFromPage({pageId: self.get('id'), userId: self.get('viewerId'),
+                        successCallback: function (result) {
+                            self.trigger('declineShare', self.get('id'));
+                        }
+                    });
+                }
+            })
         }
     });
 
     return {
-        page: new Page(),
+        currentPage: new Page(),
         users: new Users()
     }
 

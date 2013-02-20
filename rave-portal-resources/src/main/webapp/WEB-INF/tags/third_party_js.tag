@@ -25,10 +25,6 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js"></script>
 <%-- underscore --%>
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
-<<<<<<< HEAD
-
-=======
->>>>>>> c4ffe8b91c1ff03cd02ca2e41bcf024f414346c5
 <%-- jquery scripts --%>
 <script src="//ajax.aspnetcdn.com/ajax/jquery/jquery-1.7.2.min.js"></script>
 <script src="//ajax.aspnetcdn.com/ajax/jquery.ui/1.8.17/jquery-ui.min.js"></script>
@@ -37,8 +33,7 @@
 <%-- Touch devices --%>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.2/jquery.ui.touch-punch.min.js"></script>
 <%-- backbone --%>
-<script src="http://backbonejs.org/backbone.js"></script>
-<%--<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.10/backbone-min.js"></script>--%>
+<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.10/backbone-min.js"></script>
 <%-- bootstrap --%>
 <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.0.3/bootstrap.min.js"></script>
 <%-- handelbars --%>
