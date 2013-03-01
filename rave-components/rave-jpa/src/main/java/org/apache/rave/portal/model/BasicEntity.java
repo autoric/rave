@@ -17,11 +17,12 @@
  * under the License.
  */
 
-package org.apache.rave.portal.activities.specification;
+package org.apache.rave.portal.model;
 
-public final class MediaLinkComponent {
-    public static final String DURATION="duration";
-    public static final String HEIGHT="height";
-    public static final String URL="url";
-    public static final String WIDTH="width";
+/**
+ * Defines common properties implemented by Entities in the model
+ */
+public interface BasicEntity {
+    Long getEntityId();
+    void setEntityId(Long entityId);
 }

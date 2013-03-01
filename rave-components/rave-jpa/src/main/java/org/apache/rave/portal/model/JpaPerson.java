@@ -19,7 +19,6 @@
 
 package org.apache.rave.portal.model;
 
-import org.apache.rave.persistence.BasicEntity;
 import org.apache.rave.portal.model.conversion.ConvertingListProxyFactory;
 
 import javax.persistence.*;
@@ -106,7 +105,7 @@ public class JpaPerson implements BasicEntity, Person, Serializable {
     @JoinColumn(name="person_id", referencedColumnName = "entity_id")
     protected List<JpaOrganization> organizations;
 
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = JpaPersonProperty.class)
+    @OneToMany(fetch = FetchType.EAGER, targetEntity = JpaPersonProperty.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "person_id", referencedColumnName = "entity_id")
     protected List<JpaPersonProperty> properties;
 
