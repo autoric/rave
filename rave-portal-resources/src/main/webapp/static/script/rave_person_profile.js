@@ -80,6 +80,14 @@ rave.personprofile = rave.personprofile || (function() {
          return exists;
      }
 
+    function updateParamsInString(i18nStr, itemsToReplace){
+        for(var i=0;i<itemsToReplace.length;i++){
+            var token = '{'+i+'}';
+            i18nStr = i18nStr.replace(token, itemsToReplace[i]);
+        }
+        return i18nStr;
+    }
+
      function dealWithUserResults(userResults){
          var currentUser = $("#addRemoveFriend").get(0).value;
          var searchTerm = $('#searchTerm').get(0).value;
@@ -92,7 +100,7 @@ rave.personprofile = rave.personprofile || (function() {
          if(userResults.result.resultSet.length < 1){
              legend = rave.getClientMessage("no.results.found");
          }else{
-             legend = rave.layout.searchHandler.updateParamsInString(rave.getClientMessage("search.list.result.x.to.y"),
+             legend = updateParamsInString(rave.getClientMessage("search.list.result.x.to.y"),
                  new Array(userResults.result.offset + 1, userResults.result.resultSet.length
                      + userResults.result.offset, userResults.result.totalResults));
          }
@@ -252,7 +260,7 @@ rave.personprofile = rave.personprofile || (function() {
 
      // Remove a friend of the current user
      function removeFriend(userId, username){
-         var message = rave.layout.searchHandler.updateParamsInString(rave.getClientMessage("remove.friend.confirm"),
+         var message = updateParamsInString(rave.getClientMessage("remove.friend.confirm"),
                  new Array(username));
          if(confirm(message)){
              $('#friendStatusButtonHolder'+userId).hide();
@@ -277,7 +285,7 @@ rave.personprofile = rave.personprofile || (function() {
 
      // Cancel the friend request already sent to a user
      function removeFriendRequestSent(userId, username){
-         var message = rave.layout.searchHandler.updateParamsInString(rave.getClientMessage("remove.friend.request.confirm"),
+         var message = updateParamsInString(rave.getClientMessage("remove.friend.request.confirm"),
                  new Array(username));
          if(confirm(message)){
              $('#friendStatusButtonHolder'+userId).hide();
