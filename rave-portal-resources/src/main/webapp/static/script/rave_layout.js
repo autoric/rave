@@ -175,8 +175,6 @@ rave.layout = rave.layout || (function () {
         }
     })();
 
-    // functions associated with the user search for sharing pages
-
     // widget menu related functions
     var widgetMenu = (function () {
         var $menu;
